@@ -377,18 +377,19 @@
                 </div>
             </div>
 			<div class="question">
+<div class="question">
     <div class="question-title">Personal Information</div>
     <div class="options" style="gap: 20px;">
         <div class="option" style="background-color: transparent; cursor: default;">
             <div class="option-content" style="display: block; padding: 0;">
-                <label for="userName" style="display: block; margin-bottom: 10px; font-weight: 500;">Your Name:</label>
-                <input type="text" id="userName" name="userName" required style="width: 100%; padding: 12px; border: 1px solid #d4d4d4; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 16px; box-sizing: border-box;">
+                <label for="name" style="display: block; margin-bottom: 10px; font-weight: 500;">Your Name:</label>
+                <input type="text" id="name" name="name" required style="width: 100%; padding: 12px; border: 1px solid #d4d4d4; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 16px; box-sizing: border-box;">
             </div>
         </div>
         <div class="option" style="background-color: transparent; cursor: default;">
             <div class="option-content" style="display: block; padding: 0;">
-                <label for="userEmail" style="display: block; margin-bottom: 10px; font-weight: 500;">Your Email:</label>
-                <input type="email" id W3="userEmail" name="userEmail" required style="width: 100%; padding: 12px; border: 1px solid #d4d4d4; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 16px; box-sizing: border-box;">
+                <label for="email" style="display: block; margin-bottom: 10px; font-weight: 500;">Your Email:</label>
+                <input type="email" id="email" name="email" required style="width: 100%; padding: 12px; border: 1px solid #d4d4d4; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 16px; box-sizing: border-box;">
             </div>
         </div>
     </div>
@@ -403,8 +404,26 @@
 
     <script>
 	
-	    document.getElementById('quizForm').addEventListener('submit', function(e) {
+	  document.getElementById('quizForm').addEventListener('submit', function(e) {
   e.preventDefault();
+  
+  // Check if all questions are answered
+  let allAnswered = true;
+  const totalQuestions = 10;
+  for (let i = 1; i <= totalQuestions; i++) {
+    if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+      allAnswered = false;
+      break;
+    }
+  }
+  
+  if (!allAnswered) {
+    document.getElementById('formError').style.display = 'block';
+    return;
+  }
+  
+  document.getElementById('formError').style.display = 'none';
+  
   const form = e.target;
   const data = {
     name: form.name.value,
@@ -420,123 +439,93 @@
     q9: form.q9.value,
     q10: form.q10.value
   };
+  
+  // Add loading indicator or disable submit button here
+  const submitBtn = document.querySelector('.submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+  
   fetch('https://script.google.com/macros/s/AKfycbwQL63ex8-Jkj-YjznWPfb5z0b5eTBqLLVevpL_xThKUN4BBPfBY_QL18Oc5Izxwfn-wQ/exec', {
     method: 'POST',
     body: JSON.stringify(data),
     headers: { 'Content-Type': 'application/json' }
   })
-  .then(res => {
-    if(res.ok) alert('Thank you for your submission!');
-    else alert('Submission failed.');
+  .then(response => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'See My Results';
+    
+    if (response.ok) {
+      console.log('Form submitted successfully');
+      
+      // Count responses for each option
+      const counts = {
+        'A': 0,
+        'B': 0,
+        'C': 0,
+        'D': 0
+      };
+      
+      for (let i = 1; i <= totalQuestions; i++) {
+        const selectedOption = document.querySelector(`input[name="q${i}"]:checked`).value;
+        counts[selectedOption]++;
+      }
+      
+      // Find most selected option
+      let maxCount = 0;
+      let mostSelectedOption = '';
+      
+      for (const option in counts) {
+        if (counts[option] > maxCount) {
+          maxCount = counts[option];
+          mostSelectedOption = option;
+        }
+      }
+      
+      // In case of a tie, prioritize options in the order: A, B, C, D
+      const orderedOptions = ['A', 'B', 'C', 'D'];
+      const maxOptions = [];
+      
+      for (const option of orderedOptions) {
+        if (counts[option] === maxCount) {
+          maxOptions.push(option);
+        }
+      }
+      
+      mostSelectedOption = maxOptions[0]; // Take the first one based on priority
+      
+      // Redirect based on most selected option
+      let redirectURL = '';
+      
+      switch (mostSelectedOption) {
+        case 'A':
+          redirectURL = 'https://theluxuryrecharge.com/%f0%9f%92%aa-the-strategist/';
+          break;
+        case 'B':
+          redirectURL = 'https://theluxuryrecharge.com/%F0%9F%8C%8A-the-silent-storm/';
+          break;
+        case 'C':
+          redirectURL = 'https://theluxuryrecharge.com/the-survivalist/';
+          break;
+        case 'D':
+          redirectURL = 'https://theluxuryrecharge.com/%f0%9f%91%91-the-legacy-leader/';
+          break;
+        default:
+          redirectURL = 'https://theluxuryrecharge.com/';
+      }
+      
+      // Redirect to the results page
+      window.location.href = redirectURL;
+    } else {
+      alert('Submission failed. Please try again.');
+    }
   })
-  .catch(() => alert('Network error.'));
+  .catch(error => {
+    console.error('Error:', error);
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'See My Results';
+    alert('Network error. Please try again.');
+  });
 });
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('quizForm');
-            const progressBar = document.getElementById('progressBar');
-            const formError = document.getElementById('formError');
-            
-            // Update progress bar when any radio button is clicked
-            const allRadios = document.querySelectorAll('input[type="radio"]');
-            const totalQuestions = 10; // Total number of questions
-            
-            allRadios.forEach(radio => {
-                radio.addEventListener('change', updateProgress);
-            });
-            
-            function updateProgress() {
-                // Count answered questions
-                let answeredQuestions = 0;
-                for (let i = 1; i <= totalQuestions; i++) {
-                    if (document.querySelector(`input[name="q${i}"]:checked`)) {
-                        answeredQuestions++;
-                    }
-                }
-                
-                // Update progress bar
-                const progressPercentage = (answeredQuestions / totalQuestions) * 100;
-                progressBar.style.width = progressPercentage + '%';
-            }
-            
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Check if all questions are answered
-                let allAnswered = true;
-                for (let i = 1; i <= totalQuestions; i++) {
-                    if (!document.querySelector(`input[name="q${i}"]:checked`)) {
-                        allAnswered = false;
-                        break;
-                    }
-                }
-                
-                if (!allAnswered) {
-                    formError.style.display = 'block';
-                    return;
-                }
-                
-                formError.style.display = 'none';
-                
-                // Count responses for each option
-                const counts = {
-                    'A': 0,
-                    'B': 0,
-                    'C': 0,
-                    'D': 0
-                };
-                
-                for (let i = 1; i <= totalQuestions; i++) {
-                    const selectedOption = document.querySelector(`input[name="q${i}"]:checked`).value;
-                    counts[selectedOption]++;
-                }
-                
-                // Find most selected option
-                let maxCount = 0;
-                let mostSelectedOption = '';
-                
-                for (const option in counts) {
-                    if (counts[option] > maxCount) {
-                        maxCount = counts[option];
-                        mostSelectedOption = option;
-                    }
-                }
-                
-                // In case of a tie, prioritize options in the order: A, B, C, D
-                const orderedOptions = ['A', 'B', 'C', 'D'];
-                const maxOptions = [];
-                
-                for (const option of orderedOptions) {
-                    if (counts[option] === maxCount) {
-                        maxOptions.push(option);
-                    }
-                }
-                
-                mostSelectedOption = maxOptions[0]; // Take the first one based on priority
-                
-                // Redirect based on most selected option
-                let redirectURL = '';
-                
-                switch (mostSelectedOption) {
-                    case 'A':
-                        redirectURL = 'https://theluxuryrecharge.com/%f0%9f%92%aa-the-strategist/';
-                        break;
-                    case 'B':
-                        redirectURL = 'https://theluxuryrecharge.com/%F0%9F%8C%8A-the-silent-storm/';
-                        break;
-                    case 'C':
-                        redirectURL = 'https://theluxuryrecharge.com/the-survivalist/';
-                        break;
-                    case 'D':
-                        redirectURL = 'https://theluxuryrecharge.com/%f0%9f%91%91-the-legacy-leader/';
-                        break;
-                    default:
-                        redirectURL = 'https://theluxuryrecharge.com/';
-                }
-                
-                // Redirect directly to the results page
-                window.location.href = redirectURL;
-            });
-        });
 		
     </script>
 </body>
