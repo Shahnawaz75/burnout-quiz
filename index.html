@@ -404,127 +404,169 @@
 
     <script>
 	
-	  document.getElementById('quizForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  // Check if all questions are answered
-  let allAnswered = true;
-  const totalQuestions = 10;
-  for (let i = 1; i <= totalQuestions; i++) {
-    if (!document.querySelector(`input[name="q${i}"]:checked`)) {
-      allAnswered = false;
-      break;
-    }
-  }
-  
-  if (!allAnswered) {
-    document.getElementById('formError').style.display = 'block';
-    return;
-  }
-  
-  document.getElementById('formError').style.display = 'none';
-  
-  const form = e.target;
-  const data = {
-    name: form.name.value,
-    email: form.email.value,
-    q1: form.q1.value,
-    q2: form.q2.value,
-    q3: form.q3.value,
-    q4: form.q4.value,
-    q5: form.q5.value,
-    q6: form.q6.value,
-    q7: form.q7.value,
-    q8: form.q8.value,
-    q9: form.q9.value,
-    q10: form.q10.value
-  };
-  
-  // Add loading indicator or disable submit button here
-  const submitBtn = document.querySelector('.submit-btn');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Submitting...';
-  
-  fetch('https://script.google.com/macros/s/AKfycbwQL63ex8-Jkj-YjznWPfb5z0b5eTBqLLVevpL_xThKUN4BBPfBY_QL18Oc5Izxwfn-wQ/exec', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json' }
-  })
-  .then(response => {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'See My Results';
+	 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('quizForm');
+    const progressBar = document.getElementById('progressBar');
+    const formError = document.getElementById('formError');
     
-    if (response.ok) {
-      console.log('Form submitted successfully');
-      
-      // Count responses for each option
-      const counts = {
-        'A': 0,
-        'B': 0,
-        'C': 0,
-        'D': 0
-      };
-      
-      for (let i = 1; i <= totalQuestions; i++) {
-        const selectedOption = document.querySelector(`input[name="q${i}"]:checked`).value;
-        counts[selectedOption]++;
-      }
-      
-      // Find most selected option
-      let maxCount = 0;
-      let mostSelectedOption = '';
-      
-      for (const option in counts) {
-        if (counts[option] > maxCount) {
-          maxCount = counts[option];
-          mostSelectedOption = option;
+    // Update progress bar when any radio button is clicked
+    const allRadios = document.querySelectorAll('input[type="radio"]');
+    const totalQuestions = 10; // Total number of questions
+    
+    allRadios.forEach(radio => {
+        radio.addEventListener('change', updateProgress);
+    });
+    
+    function updateProgress() {
+        // Count answered questions
+        let answeredQuestions = 0;
+        for (let i = 1; i <= totalQuestions; i++) {
+            if (document.querySelector(`input[name="q${i}"]:checked`)) {
+                answeredQuestions++;
+            }
         }
-      }
-      
-      // In case of a tie, prioritize options in the order: A, B, C, D
-      const orderedOptions = ['A', 'B', 'C', 'D'];
-      const maxOptions = [];
-      
-      for (const option of orderedOptions) {
-        if (counts[option] === maxCount) {
-          maxOptions.push(option);
-        }
-      }
-      
-      mostSelectedOption = maxOptions[0]; // Take the first one based on priority
-      
-      // Redirect based on most selected option
-      let redirectURL = '';
-      
-      switch (mostSelectedOption) {
-        case 'A':
-          redirectURL = 'https://theluxuryrecharge.com/%f0%9f%92%aa-the-strategist/';
-          break;
-        case 'B':
-          redirectURL = 'https://theluxuryrecharge.com/%F0%9F%8C%8A-the-silent-storm/';
-          break;
-        case 'C':
-          redirectURL = 'https://theluxuryrecharge.com/the-survivalist/';
-          break;
-        case 'D':
-          redirectURL = 'https://theluxuryrecharge.com/%f0%9f%91%91-the-legacy-leader/';
-          break;
-        default:
-          redirectURL = 'https://theluxuryrecharge.com/';
-      }
-      
-      // Redirect to the results page
-      window.location.href = redirectURL;
-    } else {
-      alert('Submission failed. Please try again.');
+        
+        // Update progress bar
+        const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+        progressBar.style.width = progressPercentage + '%';
     }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'See My Results';
-    alert('Network error. Please try again.');
-  });
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Check if all questions are answered
+        let allAnswered = true;
+        for (let i = 1; i <= totalQuestions; i++) {
+            if (!document.querySelector(`input[name="q${i}"]:checked`)) {
+                allAnswered = false;
+                break;
+            }
+        }
+        
+        if (!allAnswered) {
+            formError.style.display = 'block';
+            return;
+        }
+        
+        formError.style.display = 'none';
+        
+        // Get form data
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            q1: document.querySelector('input[name="q1"]:checked').value,
+            q2: document.querySelector('input[name="q2"]:checked').value,
+            q3: document.querySelector('input[name="q3"]:checked').value,
+            q4: document.querySelector('input[name="q4"]:checked').value,
+            q5: document.querySelector('input[name="q5"]:checked').value,
+            q6: document.querySelector('input[name="q6"]:checked').value,
+            q7: document.querySelector('input[name="q7"]:checked').value,
+            q8: document.querySelector('input[name="q8"]:checked').value,
+            q9: document.querySelector('input[name="q9"]:checked').value,
+            q10: document.querySelector('input[name="q10"]:checked').value
+        };
+        
+        // Log the data being sent
+        console.log("Sending data:", formData);
+        
+        // Change button state to loading
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        
+        // Send data to Google Apps Script
+        fetch('https://script.google.com/macros/s/AKfycbwQL63ex8-Jkj-YjznWPfb5z0b5eTBqLLVevpL_xThKUN4BBPfBY_QL18Oc5Izxwfn-wQ/exec', {
+            method: 'POST',
+            body: JSON.stringify(formData),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors' // Explicitly set CORS mode
+        })
+        .then(response => {
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'See My Results';
+            
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            
+            // Count responses for each option
+            const counts = {
+                'A': 0,
+                'B': 0,
+                'C': 0,
+                'D': 0
+            };
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`).value;
+                counts[selectedOption]++;
+            }
+            
+            // Find most selected option
+            let maxCount = 0;
+            let mostSelectedOption = '';
+            
+            for (const option in counts) {
+                if (counts[option] > maxCount) {
+                    maxCount = counts[option];
+                    mostSelectedOption = option;
+                }
+            }
+            
+            // In case of a tie, prioritize options in the order: A, B, C, D
+            const orderedOptions = ['A', 'B', 'C', 'D'];
+            const maxOptions = [];
+            
+            for (const option of orderedOptions) {
+                if (counts[option] === maxCount) {
+                    maxOptions.push(option);
+                }
+            }
+            
+            mostSelectedOption = maxOptions[0]; // Take the first one based on priority
+            
+            // Redirect based on most selected option
+            let redirectURL = '';
+            
+            switch (mostSelectedOption) {
+                case 'A':
+                    redirectURL = 'https://theluxuryrecharge.com/%f0%9f%92%aa-the-strategist/';
+                    break;
+                case 'B':
+                    redirectURL = 'https://theluxuryrecharge.com/%F0%9F%8C%8A-the-silent-storm/';
+                    break;
+                case 'C':
+                    redirectURL = 'https://theluxuryrecharge.com/the-survivalist/';
+                    break;
+                case 'D':
+                    redirectURL = 'https://theluxuryrecharge.com/%f0%9f%91%91-the-legacy-leader/';
+                    break;
+                default:
+                    redirectURL = 'https://theluxuryrecharge.com/';
+            }
+            
+            // Add a small delay before redirecting for better UX
+            setTimeout(() => {
+                window.location.href = redirectURL;
+            }, 500);
+        })
+        .catch(error => {
+            // Reset button state
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'See My Results';
+            
+            console.error('Error:', error);
+            alert('Submission failed. Please try again.');
+        });
+    });
 });
 		
     </script>
