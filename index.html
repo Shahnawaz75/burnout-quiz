@@ -5,136 +5,376 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burnout Style Quiz</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #ff9966;
+            --primary-light: #ffb999;
+            --primary-dark: #ff8652;
+            --secondary: #4a4a4a;
+            --background: #f9f7f5;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #777777;
+            --border-radius: 12px;
+            --shadow: 0 6px 16px rgba(0,0,0,0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f7f5f2;
+            color: var(--text);
+            background-color: var(--background);
+            background-image: 
+                radial-gradient(var(--primary-light) 1px, transparent 1px),
+                radial-gradient(var(--primary-light) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
         }
+        
         .form-container {
-            background-color: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
             margin-bottom: 40px;
+            transition: var(--transition);
         }
+        
         .form-header {
             margin-bottom: 30px;
+            text-align: center;
         }
+        
         .form-header h1 {
-            color: #333;
+            color: var(--secondary);
             margin: 0;
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
         }
+        
+        .form-header h1:after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+        
         .form-description {
-            margin-bottom: 30px;
-            color: #555;
+            margin-bottom: 40px;
+            color: var(--text-light);
             font-size: 16px;
+            text-align: center;
+            font-weight: 300;
         }
+        
+        .progress-container {
+            margin-bottom: 40px;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .progress {
+            background-color: #e9e9e9;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
         .question {
             margin-bottom: 40px;
             border-bottom: 1px solid #eee;
             padding-bottom: 30px;
         }
+        
         .question:last-child {
             border-bottom: none;
+            margin-bottom: 20px;
         }
+        
         .question-title {
             font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            color: #333;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--secondary);
+            display: flex;
         }
+        
+        .question-count {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
         .options {
-            margin-left: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
+        
         .option {
+            position: relative;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: var(--transition);
+            background-color: #f5f5f5;
+            overflow: hidden;
+        }
+        
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .option-content {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 16px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            background-color: #f7f5f2;
-            transition: background-color 0.2s;
+            padding: 16px 20px;
         }
-        .option:hover {
-            background-color: #f0ede8;
-        }
-        .option input {
+        
+        .radio-custom {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #d4d4d4;
             margin-right: 16px;
-            margin-top: 4px;
-            accent-color: #ff9966;
+            margin-top: 2px;
+            transition: var(--transition);
         }
+        
+        .radio-custom::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .option input[type="radio"]:checked ~ .option-content .radio-custom {
+            border-color: var(--primary);
+        }
+        
+        .option input[type="radio"]:checked ~ .option-content .radio-custom::after {
+            opacity: 1;
+        }
+        
+        .option input[type="radio"]:checked ~ .option-content {
+            background-color: rgba(255, 153, 102, 0.05);
+        }
+        
         .option label {
             cursor: pointer;
+            font-weight: 400;
+            color: var(--text);
             flex: 1;
         }
+        
+        .action-container {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .error {
+            color: #e74c3c;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+            padding: 12px 20px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid #e74c3c;
+            width: 100%;
+            max-width: 500px;
+        }
+        
         .submit-btn {
-            background-color: #ff9966;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
             border-radius: 30px;
-            padding: 14px 32px;
+            padding: 16px 36px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-            display: block;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 200px;
+            box-shadow: 0 4px 10px rgba(255, 153, 102, 0.3);
         }
+        
         .submit-btn:hover {
-            background-color: #ff8652;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 153, 102, 0.4);
         }
-        .error {
-            color: #d32f2f;
-            margin-top: 8px;
-            font-size: 14px;
-            display: none;
-            text-align: center;
+        
+        .submit-btn:active {
+            transform: translateY(0);
         }
-        .progress {
-            background-color: #e0e0e0;
-            height: 6px;
-            border-radius: 3px;
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            background-color: #ff9966;
-            height: 100%;
-            width: 0%;
-            border-radius: 3px;
-            transition: width 0.3s;
-        }
+        
         .branding {
             text-align: center;
-            margin-top: 20px;
-            margin-bottom: 30px;
+            margin: 0 auto 40px;
+            animation: fadeIn 1s ease-in-out;
         }
+        
         .logo {
-            font-size: 36px;
-            font-weight: 700;
-            color: #ff9966;
-            letter-spacing: 8px;
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 10px;
             text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
         }
+        
         .tagline {
             font-size: 14px;
-            color: #888;
+            color: var(--text-light);
             margin-top: 5px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            font-weight: 300;
         }
-        .question-count {
-            font-weight: 600;
-            color: #666;
+        
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 153, 102, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        .loading-text {
+            color: var(--secondary);
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .loading-subtext {
+            color: var(--text-light);
+            font-size: 14px;
+            max-width: 300px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 25px;
+                border-radius: 10px;
+            }
+            
+            .form-header h1 {
+                font-size: 26px;
+            }
+            
+            .question-title {
+                font-size: 16px;
+            }
+            
+            .option-content {
+                padding: 14px 16px;
+            }
+            
+            .logo {
+                font-size: 36px;
+                letter-spacing: 8px;
+            }
         }
     </style>
 </head>
@@ -149,11 +389,17 @@
             <h1>Burnout Style Quiz</h1>
         </div>
         <div class="form-description">
-            <p>Discover your burnout style and get personalized recommendations for a sustainable recharge.</p>
+            <p>Discover your unique burnout style and receive personalized recommendations for a sustainable recharge that fits your lifestyle.</p>
         </div>
         
-        <div class="progress">
-            <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-container">
+            <div class="progress-info">
+                <span id="progressText">0/10 questions answered</span>
+                <span id="progressPercentage">0%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
         </div>
         
         <form id="quizForm">
@@ -162,19 +408,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q1-a" name="q1" value="A" required>
-                        <label for="q1-a">Make a to-do list and plan my way out of it.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q1-a">Make a to-do list and plan my way out of it.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q1-b" name="q1" value="B">
-                        <label for="q1-b">Keep quiet, push through, and pretend I'm fine.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q1-b">Keep quiet, push through, and pretend I'm fine.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q1-c" name="q1" value="C">
-                        <label for="q1-c">Feel guilty for even thinking about taking a break.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q1-c">Feel guilty for even thinking about taking a break.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q1-d" name="q1" value="D">
-                        <label for="q1-d">Shut down completely or go numb.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q1-d">Shut down completely or go numb.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -184,19 +442,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q2-a" name="q2" value="A" required>
-                        <label for="q2-a">It's scheduled but rarely followed through.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q2-a">It's scheduled but rarely followed through.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q2-b" name="q2" value="B">
-                        <label for="q2-b">I hide in silence and try to decompress alone.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q2-b">I hide in silence and try to decompress alone.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q2-c" name="q2" value="C">
-                        <label for="q2-c">Rest? That's for when everyone else is handled first.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q2-c">Rest? That's for when everyone else is handled first.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q2-d" name="q2" value="D">
-                        <label for="q2-d">I crash from exhaustion—I don't really choose rest.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q2-d">I crash from exhaustion—I don't really choose rest.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -206,19 +476,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q3-a" name="q3" value="A" required>
-                        <label for="q3-a">A clear, structured plan with nothing falling through the cracks.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q3-a">A clear, structured plan with nothing falling through the cracks.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q3-b" name="q3" value="B">
-                        <label for="q3-b">Knowing I won't be judged or questioned for slowing down.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q3-b">Knowing I won't be judged or questioned for slowing down.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q3-c" name="q3" value="C">
-                        <label for="q3-c">Permission from someone I trust that it's okay.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q3-c">Permission from someone I trust that it's okay.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q3-d" name="q3" value="D">
-                        <label for="q3-d">Not being in survival mode for once.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q3-d">Not being in survival mode for once.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -228,19 +510,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q4-a" name="q4" value="A" required>
-                        <label for="q4-a">I plan how to fit them in anyway.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q4-a">I plan how to fit them in anyway.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q4-b" name="q4" value="B">
-                        <label for="q4-b">I say yes but resent it internally.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q4-b">I say yes but resent it internally.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q4-c" name="q4" value="C">
-                        <label for="q4-c">I show up, no matter what—it's my role.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q4-c">I show up, no matter what—it's my role.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q4-d" name="q4" value="D">
-                        <label for="q4-d">I avoid or ignore them to protect my energy.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q4-d">I avoid or ignore them to protect my energy.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -250,19 +544,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q5-a" name="q5" value="A" required>
-                        <label for="q5-a">I don't show weakness—it's easier to stay in control.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q5-a">I don't show weakness—it's easier to stay in control.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q5-b" name="q5" value="B">
-                        <label for="q5-b">I keep everything inside—I've been burned before.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q5-b">I keep everything inside—I've been burned before.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q5-c" name="q5" value="C">
-                        <label for="q5-c">I only open up when I have to.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q5-c">I only open up when I have to.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q5-d" name="q5" value="D">
-                        <label for="q5-d">I'm just trying to survive, not fall apart.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q5-d">I'm just trying to survive, not fall apart.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -272,19 +578,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q6-a" name="q6" value="A" required>
-                        <label for="q6-a">After checking off everything on my list.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q6-a">After checking off everything on my list.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q6-b" name="q6" value="B">
-                        <label for="q6-b">When no one needed me and I could be invisible.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q6-b">When no one needed me and I could be invisible.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q6-c" name="q6" value="C">
-                        <label for="q6-c">Maybe before kids, career, or caregiving.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q6-c">Maybe before kids, career, or caregiving.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q6-d" name="q6" value="D">
-                        <label for="q6-d">I don't remember.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q6-d">I don't remember.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -294,19 +612,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q7-a" name="q7" value="A" required>
-                        <label for="q7-a">A system or team I can trust to hold things down.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q7-a">A system or team I can trust to hold things down.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q7-b" name="q7" value="B">
-                        <label for="q7-b">Quiet presence—just someone being with me in silence.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q7-b">Quiet presence—just someone being with me in silence.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q7-c" name="q7" value="C">
-                        <label for="q7-c">Affirmation and reassurance that I'm not failing.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q7-c">Affirmation and reassurance that I'm not failing.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q7-d" name="q7" value="D">
-                        <label for="q7-d">Immediate, no-questions-asked help.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q7-d">Immediate, no-questions-asked help.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -316,19 +646,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q8-a" name="q8" value="A" required>
-                        <label for="q8-a">I wish I had time to do it right.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q8-a">I wish I had time to do it right.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q8-b" name="q8" value="B">
-                        <label for="q8-b">It sounds nice, but not really for me.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q8-b">It sounds nice, but not really for me.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q8-c" name="q8" value="C">
-                        <label for="q8-c">I think of it as something to earn.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q8-c">I think of it as something to earn.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q8-d" name="q8" value="D">
-                        <label for="q8-d">I don't think that's realistic.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q8-d">I don't think that's realistic.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -338,19 +680,31 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q9-a" name="q9" value="A" required>
-                        <label for="q9-a">Being organized, dependable, and staying ahead of chaos.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q9-a">Being organized, dependable, and staying ahead of chaos.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q9-b" name="q9" value="B">
-                        <label for="q9-b">Keeping it together when no one notices your struggle.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q9-b">Keeping it together when no one notices your struggle.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q9-c" name="q9" value="C">
-                        <label for="q9-c">Holding everything down for your family and community.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q9-c">Holding everything down for your family and community.</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q9-d" name="q9" value="D">
-                        <label for="q9-d">Surviving every single day.</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q9-d">Surviving every single day.</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -360,136 +714,68 @@
                 <div class="options">
                     <div class="option">
                         <input type="radio" id="q10-a" name="q10" value="A" required>
-                        <label for="q10-a">"You don't have to do it all right now."</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q10-a">"You don't have to do it all right now."</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q10-b" name="q10" value="B">
-                        <label for="q10-b">"You're allowed to speak up and ask for help."</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q10-b">"You're allowed to speak up and ask for help."</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q10-c" name="q10" value="C">
-                        <label for="q10-c">"You are not selfish for choosing yourself."</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q10-c">"You are not selfish for choosing yourself."</label>
+                        </div>
                     </div>
                     <div class="option">
                         <input type="radio" id="q10-d" name="q10" value="D">
-                        <label for="q10-d">"You're safe now. You can finally breathe."</label>
+                        <div class="option-content">
+                            <div class="radio-custom"></div>
+                            <label for="q10-d">"You're safe now. You can finally breathe."</label>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="error" id="formError">Please answer all questions before submitting.</div>
             
-            <button type="submit" class="submit-btn">See My Results</button>
+            <div class="action-container">
+                <button type="submit" class="submit-btn" id="submitBtn">See My Results</button>
+            </div>
         </form>
+    </div>
+    
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Analyzing your responses...</div>
+        <div class="loading-subtext">Preparing your personalized burnout style profile</div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('quizForm');
             const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressPercentage = document.getElementById('progressPercentage');
             const formError = document.getElementById('formError');
+            const loadingOverlay = document.getElementById('loadingOverlay');
             
-            // Update progress bar when any radio button is clicked
-            const allRadios = document.querySelectorAll('input[type="radio"]');
-            const totalQuestions = 10; // Total number of questions
-            
-            allRadios.forEach(radio => {
-                radio.addEventListener('change', updateProgress);
+            // Make whole option clickable
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // Trigger the change event manually
+                    const event = new Event('change');
+                    radio.dispatchEvent(event);
+                });
             });
-            
-            function updateProgress() {
-                // Count answered questions
-                let answeredQuestions = 0;
-                for (let i = 1; i <= totalQuestions; i++) {
-                    if (document.querySelector(`input[name="q${i}"]:checked`)) {
-                        answeredQuestions++;
-                    }
-                }
-                
-                // Update progress bar
-                const progressPercentage = (answeredQuestions / totalQuestions) * 100;
-                progressBar.style.width = progressPercentage + '%';
-            }
-            
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Check if all questions are answered
-                let allAnswered = true;
-                for (let i = 1; i <= totalQuestions; i++) {
-                    if (!document.querySelector(`input[name="q${i}"]:checked`)) {
-                        allAnswered = false;
-                        break;
-                    }
-                }
-                
-                if (!allAnswered) {
-                    formError.style.display = 'block';
-                    return;
-                }
-                
-                formError.style.display = 'none';
-                
-                // Count responses for each option
-                const counts = {
-                    'A': 0,
-                    'B': 0,
-                    'C': 0,
-                    'D': 0
-                };
-                
-                for (let i = 1; i <= totalQuestions; i++) {
-                    const selectedOption = document.querySelector(`input[name="q${i}"]:checked`).value;
-                    counts[selectedOption]++;
-                }
-                
-                // Find most selected option
-                let maxCount = 0;
-                let mostSelectedOption = '';
-                
-                for (const option in counts) {
-                    if (counts[option] > maxCount) {
-                        maxCount = counts[option];
-                        mostSelectedOption = option;
-                    }
-                }
-                
-                // In case of a tie, prioritize options in the order: A, B, C, D
-                const orderedOptions = ['A', 'B', 'C', 'D'];
-                const maxOptions = [];
-                
-                for (const option of orderedOptions) {
-                    if (counts[option] === maxCount) {
-                        maxOptions.push(option);
-                    }
-                }
-                
-                mostSelectedOption = maxOptions[0]; // Take the first one based on priority
-                
-                // Redirect based on most selected option
-                let redirectURL = '';
-                
-                switch (mostSelectedOption) {
-                    case 'A':
-                        redirectURL = 'https://theluxuryrecharge.com/%f0%9f%92%aa-the-strategist/';
-                        break;
-                    case 'B':
-                        redirectURL = 'https://theluxuryrecharge.com/%F0%9F%8C%8A-the-silent-storm/';
-                        break;
-                    case 'C':
-                        redirectURL = 'https://theluxuryrecharge.com/the-survivalist/';
-                        break;
-                    case 'D':
-                        redirectURL = 'https://theluxuryrecharge.com/%f0%9f%91%91-the-legacy-leader/';
-                        break;
-                    default:
-                        redirectURL = 'https://theluxuryrecharge.com/';
-                }
-                
-                // Redirect directly to the results page
-                window.location.href = redirectURL;
-            });
-        });
-    </script>
-</body>
-</html>
